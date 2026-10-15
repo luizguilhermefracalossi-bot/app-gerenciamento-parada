@@ -1,0 +1,9 @@
+import { WebSocketGateway, WebSocketServer, SubscribeMessage, ConnectedSocket, MessageBody } from '@nestjs/websockets';
+import type { Server, Socket } from 'socket.io'; import { subscribe } from '@shutdown/contracts'; import { verifyToken, type Principal } from './auth.js'; import { ShutdownService } from './shutdown.service.js';
+@WebSocketGateway({namespace:'/realtime',cors:{origin:(process.env.CORS_ORIGINS??'http://localhost:5173').split(','),credentials:true},maxHttpBufferSize:100_000})
+export class RealtimeGateway { @WebSocketServer() server!:Server; constructor(private readonly service:ShutdownService){}
+  afterInit(){this.server.use(async(socket,next)=>{try{const raw=socket.handshake.auth.token??socket.handshake.headers.authorization?.replace(/^Bearer /,'');if(typeof raw!=='string')throw new Error();socket.data.principal=await verifyToken(raw);next();}catch{next(new Error('UNAUTHENTICATED'));}});}
+  @SubscribeMessage('shutdown.subscribe') async subscribe(@ConnectedSocket() socket:Socket,@MessageBody() body:unknown){const input=subscribe.parse(body);const p=socket.data.principal as Principal;const u=await this.service.user(p);await this.service.membership(this.service.db as any,input.shutdownId,u);await socket.join(`shutdown:${input.shutdownId}`);const head=(await this.service.db.query<{event_sequence:string}>('SELECT event_sequence FROM shutdowns WHERE id=$1',[input.shutdownId])).rows[0]!.event_sequence;return {ok:true,shutdownId:input.shutdownId,headSequence:head};}
+  @SubscribeMessage('shutdown.unsubscribe') async unsubscribe(@ConnectedSocket() socket:Socket,@MessageBody() body:unknown){const input=subscribe.parse(body);await socket.leave(`shutdown:${input.shutdownId}`);return {ok:true};}
+  revoke(shutdownId:string,userId:string){for(const socket of this.server.sockets.sockets.values())if(socket.data.userId===userId){socket.leave(`shutdown:${shutdownId}`);socket.emit('realtime',{kind:'access.revoked',shutdownId});}}
+}

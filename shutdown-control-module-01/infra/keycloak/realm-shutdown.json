@@ -1,0 +1,10 @@
+{
+  "realm":"shutdown","enabled":true,"clients":[{"clientId":"shutdown-api","enabled":true,"publicClient":true,"directAccessGrantsEnabled":true,"redirectUris":["http://localhost:*/*"],"defaultClientScopes":["profile","email"]}],
+  "roles":{"realm":[{"name":"shutdown-provisioner"}]},
+  "users":[
+    {"username":"planner","enabled":true,"credentials":[{"type":"password","value":"planner-dev","temporary":false}],"realmRoles":["shutdown-provisioner"]},
+    {"username":"supervisor","enabled":true,"credentials":[{"type":"password","value":"supervisor-dev","temporary":false}]},
+    {"username":"operator","enabled":true,"credentials":[{"type":"password","value":"operator-dev","temporary":false}]},
+    {"username":"viewer","enabled":true,"credentials":[{"type":"password","value":"viewer-dev","temporary":false}]}
+  ]
+}

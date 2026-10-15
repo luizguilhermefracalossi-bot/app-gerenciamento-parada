@@ -1,0 +1,2 @@
+import { Module } from '@nestjs/common'; import { ShutdownController } from './shutdown.controller.js'; import { ShutdownService } from './shutdown.service.js'; import { AuthGuard } from './auth.js'; import { RealtimeGateway } from './realtime.gateway.js'; import { OutboxService } from './outbox.service.js';
+@Module({controllers:[ShutdownController],providers:[ShutdownService,AuthGuard,RealtimeGateway,OutboxService]}) export class AppModule{}

@@ -1,0 +1,6 @@
+{
+  "name": "@shutdown/database", "version": "0.1.0", "private": true, "type": "module",
+  "exports": { ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
+  "scripts": { "build": "tsc -p tsconfig.json", "lint": "tsc --noEmit", "typecheck": "tsc --noEmit", "test": "vitest run", "test:integration": "vitest run --passWithNoTests", "migrate": "tsx scripts/migrate.ts", "seed": "tsx scripts/seed.ts" },
+  "dependencies": { "drizzle-orm": "^0.44.2", "pg": "^8.16.0" }, "devDependencies": { "@types/node": "^22.15.30", "@types/pg": "^8.15.4", "tsx": "^4.19.4", "typescript": "^5.8.3", "vitest": "^3.2.3" }
+}

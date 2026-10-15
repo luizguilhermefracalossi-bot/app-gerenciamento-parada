@@ -1,0 +1,18 @@
+{
+  "name": "shutdown-control",
+  "private": true,
+  "packageManager": "pnpm@11.25.0",
+  "engines": { "node": ">=22.12.0" },
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "test": "turbo test",
+    "test:integration": "turbo test:integration",
+    "migrate": "pnpm --filter @shutdown/database migrate",
+    "seed": "pnpm --filter @shutdown/database seed",
+    "openapi": "pnpm --filter @shutdown/api openapi"
+  },
+  "devDependencies": { "@types/node": "^22.15.30", "prettier": "^3.5.3", "turbo": "^2.5.4", "typescript": "^5.8.3", "vitest": "^3.2.3" }
+}

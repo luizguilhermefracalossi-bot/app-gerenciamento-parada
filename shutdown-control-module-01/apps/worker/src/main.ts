@@ -1,0 +1,4 @@
+import { createPool } from '@shutdown/database'; import { UnavailableSchedulingEngine } from '@shutdown/scheduling';
+const db=createPool(); const engine=new UnavailableSchedulingEngine();
+async function reconcile(){const runs=await db.query("SELECT id,shutdown_id,input_revision FROM schedule_runs WHERE state='PENDING' ORDER BY created_at FOR UPDATE SKIP LOCKED LIMIT 10");for(const run of runs.rows){try{await db.query("UPDATE schedule_runs SET state='RUNNING',started_at=now() WHERE id=$1",[run.id]);await engine.calculate({shutdownId:run.shutdown_id,inputRevision:BigInt(run.input_revision),activities:[],dependencies:[]});}catch{await db.query("UPDATE schedule_runs SET state='UNAVAILABLE',error_code='ENGINE_UNAVAILABLE',finished_at=now() WHERE id=$1",[run.id]);}}}
+setInterval(()=>void reconcile(),5_000);void reconcile();

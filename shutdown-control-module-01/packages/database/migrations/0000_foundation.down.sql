@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS schedule_runs,audit_log,provision_command_receipts,command_receipts,outbox,domain_events,evidence_files,blockers,activity_intervals,progress_reports,allocations,dependencies,activities,resource_memberships,resources,calendar_exceptions,calendar_windows,calendars,wbs_nodes,shutdown_members,shutdowns,users CASCADE;
+DROP TYPE IF EXISTS schedule_run_state,blocker_kind,dependency_type,activity_status,member_role;

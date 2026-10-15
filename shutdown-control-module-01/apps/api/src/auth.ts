@@ -1,0 +1,7 @@
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { createRemoteJWKSet, jwtVerify, type JWTPayload } from 'jose';
+import { ApiProblem } from './errors.js';
+export type Principal={ id:string; issuer:string; subject:string; claims:JWTPayload; globalProvisioner:boolean };
+const issuer=()=>process.env.OIDC_ISSUER??'http://localhost:8080/realms/shutdown';
+export async function verifyToken(token:string):Promise<Principal>{ try { const {payload,protectedHeader}=await jwtVerify(token,createRemoteJWKSet(new URL(`${issuer()}/protocol/openid-connect/certs`)),{issuer:issuer(),audience:process.env.OIDC_AUDIENCE??'shutdown-api'}); if(!payload.sub||!payload.iss)throw new Error('sub required'); return {id:`${payload.iss}|${payload.sub}`,issuer:payload.iss,subject:payload.sub,claims:payload,globalProvisioner:(payload.realm_access as {roles?:string[]}|undefined)?.roles?.includes('shutdown-provisioner')===true}; }catch{throw new ApiProblem('UNAUTHENTICATED','Invalid or expired token',401);} }
+@Injectable() export class AuthGuard implements CanActivate { async canActivate(ctx:ExecutionContext){const req=ctx.switchToHttp().getRequest<{headers:Record<string,string|undefined>;principal?:Principal}>();const auth=req.headers.authorization;if(!auth?.startsWith('Bearer '))throw new ApiProblem('UNAUTHENTICATED','Bearer token required',401);req.principal=await verifyToken(auth.slice(7));return true;} }

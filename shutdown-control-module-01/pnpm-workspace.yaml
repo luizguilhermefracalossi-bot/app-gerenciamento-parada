@@ -1,0 +1,8 @@
+packages:
+  - apps/*
+  - packages/*
+onlyBuiltDependencies:
+  - esbuild
+allowBuilds:
+  '@scarf/scarf': set this to true or false
+  esbuild: set this to true or false
